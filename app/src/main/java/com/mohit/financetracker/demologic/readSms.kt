@@ -11,22 +11,48 @@ fun readSms(context: Context) {
 
     cursor?.use {
 
-        val bodyIndex = it.getColumnIndex("body")
-        val dateIndex = it.getColumnIndex("date")
-
         while (it.moveToNext()) {
 
+            val bodyIndex = it.getColumnIndex("body")
+            val dateIndex = it.getColumnIndex("date")
+            val addressIndex = it.getColumnIndex("address")
+
             val message = it.getString(bodyIndex) ?: continue
+            val sender = it.getString(addressIndex) ?: ""
             val date = it.getLong(dateIndex)
 
-            // STEP 1: FILTER
-            if (!isTransactionSms(message)) continue
+            // 🔥 FILTER HERE
+            if (!isValidTransaction(sender, message)) {
+                Log.d("SMS_SKIPPED", "Ignored: [$sender] $message")
+                continue
+            }
 
-            // STEP 2: EXTRACT
-            val parsed = parseSms(message) ?: continue
+            // 🧩 PARSE
+            val parsed = parseSms(message)
+
+            if (parsed == null) {
+                Log.e("SMS_FAILED", "Failed: [$sender] $message")
+                continue
+            }
 
             // STEP 3: PRINT (for now)
-            Log.d("SMS_DATA", "Amount: ${parsed.amount}, Type: ${parsed.type}")
+            Log.d(
+                "SMS_DEBUG",
+                """
+                        -------------------------------
+                        📩 ORIGINAL SMS:
+                        $message
+                    
+                        💰 Amount: ${parsed.amount}
+                        🔁 Type: ${parsed.type}
+                        🧾 Merchant: ${parsed.merchant}
+                        🏦 Account: ${parsed.account}
+                        📅 Date: ${parsed.date}
+                    
+                        ⏱ Timestamp: $date
+                        -------------------------------
+                        """.trimIndent()
+            )
         }
     }
 }
