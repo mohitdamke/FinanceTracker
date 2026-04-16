@@ -3,10 +3,11 @@ package com.mohit.financetracker.demologic
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import androidx.core.net.toUri
 
 fun readSms(context: Context) {
 
-    val uri = Uri.parse("content://sms/inbox")
+    val uri = "content://sms/inbox".toUri()
     val cursor = context.contentResolver.query(uri, null, null, null, null)
 
     cursor?.use {
