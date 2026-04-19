@@ -7,8 +7,6 @@ import androidx.core.net.toUri
 fun readSms(context: Context) {
 
     val uri = "content://sms/inbox".toUri()
-    val start = getStartOfDayMillis()
-    val end = System.currentTimeMillis()
 
     val cursor = context.contentResolver.query(
         uri,
@@ -17,6 +15,8 @@ fun readSms(context: Context) {
         null,
         "date DESC"
     )
+
+    val transactionList = mutableListOf<Pair<ParsedSms, Long>>()
 
     cursor?.use {
         val bodyIndex = it.getColumnIndex("body")
@@ -27,17 +27,19 @@ fun readSms(context: Context) {
 
             val message = it.getString(bodyIndex) ?: continue
             val sender = it.getString(addressIndex) ?: ""
-            val date = it.getLong(dateIndex)
 
-            // 🔥 FILTER (hard gate)
-            if (!isValidTransaction(sender, message, date, start, end)) {
-                continue
-            }
+            // 🔥 FILTER
+            if (!isValidTransaction(sender, message)) continue
 
-            // 🧩 PARSE (hard gate)
+            // 🔥 PARSE
             val parsed = parseSms(message) ?: continue
 
-            // ✅ ONLY SUCCESS LOG
+            val date = it.getLong(dateIndex)
+
+            // ✅ ADD TO LIST (YOU MISSED THIS)
+            transactionList.add(parsed to date)
+
+            // ✅ LOG VALID TRANSACTION
             Log.d(
                 "SMS_TXN",
                 """
@@ -51,4 +53,26 @@ fun readSms(context: Context) {
             )
         }
     }
+
+    // -----------------------------
+    // 🔥 CALCULATE AFTER LOOP
+    // -----------------------------
+
+    val today = getTodayRange()
+    val month = getMonthRange()
+
+    val todayTotal = getTotalDebitAmount(
+        transactionList,
+        today.start,
+        today.end
+    )
+
+    val monthTotal = getTotalDebitAmount(
+        transactionList,
+        month.start,
+        month.end
+    )
+
+    Log.d("RESULT", "Today Spent: ₹$todayTotal")
+    Log.d("RESULT", "Month Spent: ₹$monthTotal")
 }
