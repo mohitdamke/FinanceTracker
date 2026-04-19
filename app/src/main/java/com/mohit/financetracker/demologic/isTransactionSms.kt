@@ -1,5 +1,8 @@
 package com.mohit.financetracker.demologic
 
+// -----------------------------
+// 🔹 Sender List
+// -----------------------------
 val financialSenders = listOf(
     "SBI", "SBIN",
     "HDFC", "HDFCBK",
@@ -13,6 +16,9 @@ val financialSenders = listOf(
     "GPAY", "PHONEPE", "PAYTM"
 )
 
+// -----------------------------
+// 🔹 Filters
+// -----------------------------
 fun isBankSender(sender: String): Boolean {
     return financialSenders.any { sender.contains(it, ignoreCase = true) }
 }
@@ -26,6 +32,18 @@ fun isTransactionSms(message: String): Boolean {
     return keywords.any { message.contains(it, ignoreCase = true) }
 }
 
-fun isValidTransaction(sender: String, message: String): Boolean {
-    return isBankSender(sender) && isTransactionSms(message)
+fun isInDateRange(date: Long, start: Long, end: Long): Boolean {
+    return date in start..end
+}
+
+fun isValidTransaction(
+    sender: String,
+    message: String,
+    date: Long,
+    start: Long,
+    end: Long
+): Boolean {
+    return isBankSender(sender) &&
+            isTransactionSms(message) &&
+            isInDateRange(date, start, end)
 }
