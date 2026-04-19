@@ -61,18 +61,31 @@ fun readSms(context: Context) {
     val today = getTodayRange()
     val month = getMonthRange()
 
-    val todayTotal = getTotalDebitAmount(
+    val todayDebitTotal = getTotalDebitAmount(
         transactionList,
         today.start,
         today.end
     )
-
-    val monthTotal = getTotalDebitAmount(
+    val monthDebitTotal = getTotalDebitAmount(
+        transactionList,
+        month.start,
+        month.end
+    )
+    val todayCreditTotal = getTotalCreditAmount(
+        transactionList,
+        today.start,
+        today.end
+    )
+    val monthCreditTotal = getTotalCreditAmount(
         transactionList,
         month.start,
         month.end
     )
 
-    Log.d("RESULT", "Today Spent: ₹$todayTotal")
-    Log.d("RESULT", "Month Spent: ₹$monthTotal")
+
+    Log.d("RESULT", "Today Spent: ₹$todayDebitTotal")
+    Log.d("RESULT", "Month Spent: ₹$monthDebitTotal")
+
+    Log.d("RESULT", "Today Credit: ₹$todayCreditTotal")
+    Log.d("RESULT", "Month Credit: ₹$monthCreditTotal")
 }
