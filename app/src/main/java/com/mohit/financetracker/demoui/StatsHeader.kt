@@ -92,14 +92,14 @@ fun StatsHeader() {
                 .padding(4.dp)
         ) {
 
-            TabItem(
+            TabItem1(
                 text = "Income",
                 isSelected = selectedTab == "Income",
                 onClick = { selectedTab = "Income" },
                 modifier = Modifier.weight(1f)   // ✅ weight applied HERE
             )
 
-            TabItem(
+            TabItem1(
                 text = "Expenses",
                 isSelected = selectedTab == "Expenses",
                 onClick = { selectedTab = "Expenses" },
@@ -127,7 +127,7 @@ fun StatsHeader() {
 }
 
 @Composable
-fun TabItem(
+fun TabItem1(
     text: String,
     isSelected: Boolean,
     onClick: () -> Unit,
